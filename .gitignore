@@ -1,0 +1,22 @@
+# Environment / secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Live Postgres data directory (50MB of container state)
+postgres/data/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Airflow runtime
+airflow/logs/
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/standalone_admin_password.txt
+
+# OS
+.DS_Store

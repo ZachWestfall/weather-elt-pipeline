@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: dev
+    schema: dev
+    tables:
+      - name: raw_weather_data
+
+models:
+  - name: stg_weather
+    description: Cleaned and type-cast weather observations, one row per reading.
+    columns:
+      - name: observation_id
+        description: Surrogate key from the raw load.
+        tests: [unique, not_null]
+      - name: city
+        tests: [not_null]
+      - name: temperature_c
+        tests: [not_null]
+      - name: observed_at
+        tests: [not_null]

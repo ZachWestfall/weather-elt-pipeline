@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: dim_location
+    description: One row per observed city.
+    columns:
+      - name: location_key
+        description: md5 surrogate key over the lowercased, trimmed city name.
+        tests: [unique, not_null]
+      - name: city
+        tests: [unique, not_null]
+
+  - name: fct_weather_observation
+    description: One row per weather reading, joined to dim_location.
+    columns:
+      - name: observation_id
+        tests: [unique, not_null]
+      - name: location_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_location')
+              field: location_key
+      - name: observed_at
+        tests: [not_null]
+      - name: temperature_c
+        tests:
+          - not_null
+          - dbt_utils_accepted_range_fallback:
+              min_value: -90
+              max_value: 60
