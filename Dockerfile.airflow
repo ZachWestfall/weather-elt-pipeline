@@ -1,0 +1,17 @@
+# Airflow image with the pipeline's Python dependencies baked in.
+#
+# Deliberately a build rather than PIP_ADDITIONAL_REQUIREMENTS: that variable
+# is only honoured by the image's default entrypoint path, is skipped entirely
+# when `command` is overridden, and reinstalls on every container start.
+#
+# Version notes: Airflow 3.2.1 runs Python 3.13. psycopg2-binary only ships
+# cp313 wheels from 2.9.10 onward — older pins fall back to a source build and
+# fail on the missing pg_config. dbt-postgres 1.9.x is the first line with
+# 3.13 support.
+FROM apache/airflow:3.2.1
+
+USER airflow
+RUN pip install --no-cache-dir \
+      "psycopg2-binary>=2.9.10" \
+      "dbt-postgres~=1.9.0" \
+      "requests>=2.32.3"

@@ -1,15 +1,26 @@
+import os
+
 import psycopg2
+
 from api_request import mock_fetch_data
+
+# Connection settings come from the environment so the same code runs on the
+# host (localhost) and inside the Airflow container (service name "db").
+DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
+DB_PORT = os.environ.get("POSTGRES_PORT", "5432")
+DB_NAME = os.environ.get("POSTGRES_DB", "db")
+DB_USER = os.environ.get("POSTGRES_USER", "db_user")
+DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "db_password")
 
 def connect_to_db():
     print("Connecting to the PostgreSQL database...")
     try:
         conn = psycopg2.connect(
-            host="localhost",
-            port="5432",
-            dbname="db",
-            user="db_user",
-            password="db_password",
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
         )
         return conn
     except psycopg2.Error as e:

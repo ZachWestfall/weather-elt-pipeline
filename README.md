@@ -96,12 +96,20 @@ docker compose exec af bash -c "cd /opt/airflow/project/dbt/weather && dbt build
 
 ## Status and verification
 
-Honest account of what has been checked:
+Verified end to end on 2026-09-21:
 
-- ✅ DAG parses; `docker compose config` validates the full three-service stack.
-- ✅ Extraction and loading logic are the original working scripts, with the API key moved to an environment variable.
-- ⚠️ **The full stack has not yet been run end to end on this machine** — Docker Desktop was not running when this was assembled. Bringing it up and confirming the DAG completes green, the dbt tests pass, and the Superset dashboard renders is the outstanding verification step.
+- ✅ **All four DAG tasks complete successfully** — `extract` → `load` → `dbt_run` → `dbt_test`.
+- ✅ **16/16 dbt data tests pass** (uniqueness, not-null, referential integrity, and the temperature range assertion).
+- ✅ **The full model builds**: `dev.raw_weather_data` → `dev_staging.stg_weather` → `dev_marts.dim_location` + `dev_marts.fct_weather_observation`.
+- ✅ **Unit conversions confirmed against the loaded row**: 13 °C → 55.4 °F, 29 km/h → 18.0 mph.
+- ✅ Airflow (`:8000`) and Superset (`:8088`) both serve HTTP 200.
 - ⚠️ **No Superset dashboard definition is committed yet.** The connection is documented; the exported dashboard JSON is not in the repository.
+
+Three real defects were found and fixed by running it, which is the argument for running it:
+
+1. `insert_records.py` hardcoded `host="localhost"`, so the load task could not reach Postgres from inside the container. Connection settings now come from the environment.
+2. `PIP_ADDITIONAL_REQUIREMENTS` is silently ignored when `command` is overridden, so dbt was never installed. Replaced with a proper `Dockerfile.airflow`.
+3. `psycopg2-binary` 2.9.9 has no cp313 wheel and Airflow 3.2.1 runs Python 3.13, so it attempted a source build and failed on a missing `pg_config`. Pinned to ≥ 2.9.10.
 
 ## Limitations
 

@@ -21,7 +21,9 @@ services:
 
   af:
     container_name: airflow_container
-    image: apache/airflow:3.2.1
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
     ports:
       - 8000:8080
     environment:
@@ -37,7 +39,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-db}
       POSTGRES_USER: ${POSTGRES_USER:-db_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-db_password}
-      PIP_ADDITIONAL_REQUIREMENTS: "dbt-postgres==1.8.2 psycopg2-binary requests"
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       # The whole project is mounted so the DAG can import the loader modules

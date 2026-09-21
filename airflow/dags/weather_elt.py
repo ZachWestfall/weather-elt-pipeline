@@ -18,8 +18,8 @@ import sys
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.bash import BashOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 # The project root is mounted into the container; make the loader importable.
 sys.path.insert(0, "/opt/airflow/project")
